@@ -1,0 +1,8 @@
+id: 4
+start: 1048576
+end: 2097151
+size: 1048576
+name_or_type: primary
+fs_type: ''
+flags:
+- bios_grub

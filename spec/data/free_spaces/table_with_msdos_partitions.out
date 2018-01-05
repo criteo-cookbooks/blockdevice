@@ -1,0 +1,7 @@
+- id: 1
+  start: 32256
+  end: 4194303
+  size: 4162048
+  fs_type: free
+  name_or_type:
+  flags: []
