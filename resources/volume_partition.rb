@@ -59,18 +59,28 @@ load_current_value do |desired|
 end
 
 action :create do
-  converge_if_changed do
-    # TODO: get free partitions, find appropriate disk portion to use for the new partition
-    
-    execute "parted #{new_resource.block_device} --script -- mkpart #{new_resource.partition_type} #{new_resource.fs_type} #{new_resource.partition_name} #{new_resource.offset} #{new_resource.size}"
+  if current_resource.nil?
+    converge_by 'Creating partition' do
+      partitions = ::BlockDevice::Parted.free_spaces(new_resource.block_device)
+                                        .select { |p| new_resource.offset >= p['start'] && (new_resource.offset + new_resource.size) <= p['end'] }
+      raise if partitions.empty?
+      shell_out! "parted #{new_resource.block_device} --script -- mkpart #{new_resource.partition_type} #{new_resource.fs_type} #{new_resource.partition_name} #{new_resource.offset} #{new_resource.size}"
 
-    new_resource.flags.each do |flag|
-      execute "parted #{new_resource.block_device} --script -- set #{partnumber} #{flag} on"
+      new_resources.flags.to_a.each do |flag|
+        shell_out! "parted #{new_resource.block_device} --script -- set #{partnumber} #{flag} on"
+      end
     end
+  else
+    ::Chef::Log.warn "[BlockDevice] Do not create partition for '#{new_resource.name}' because it already exists"
   end
 end
 
 action :delete do
+  unless current_resource.nil?
+    converge_by 'Removing partition' do
+      shell_out! "parted #{new_resource.block_device} --script -- rm #{new_resource.id}"
+    end
+  end
 end
 
 action_class do
