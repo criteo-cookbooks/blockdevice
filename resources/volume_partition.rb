@@ -2,8 +2,8 @@ require 'chef/mixin/shell_out'
 extend ::Chef::Mixin::ShellOut
 
 property :block_device, String, default: '/dev/sda', identity: true
-property :flags, Array, coerce: proc { |f| f.sort! }
-property :fs_type, String
+property :flags, Array, coerce: proc { |f| f.sort }
+property :fs_type, String, default: 'xfs'
 property :id, Integer
 # Mainly for msdos disk
 property :partition_type, String, equal_to: %w[primary logical extended]
@@ -59,15 +59,20 @@ load_current_value do |desired|
 end
 
 action :create do
+  package 'parted' do
+    action :nothing
+  end.run_action(:install)
   if current_resource.nil?
+
     converge_by 'Creating partition' do
       partitions = ::BlockDevice::Parted.free_spaces(new_resource.block_device)
                                         .select { |p| new_resource.offset >= p['start'] && (new_resource.offset + new_resource.size) <= p['end'] }
-      raise if partitions.empty?
+      raise "[BlockDevice] Not Enough Space for #{new_resource.block_device}" if partitions.empty?
       shell_out! "parted #{new_resource.block_device} --script -- mkpart #{new_resource.partition_type} #{new_resource.fs_type} #{new_resource.partition_name} #{new_resource.offset} #{new_resource.size}"
-
-      new_resources.flags.to_a.each do |flag|
-        shell_out! "parted #{new_resource.block_device} --script -- set #{partnumber} #{flag} on"
+      # reload the resource to get the partition id
+      load_current_resource
+      new_resource.flags.to_a.each do |flag|
+        shell_out! "parted #{new_resource.block_device} --script -- set #{current_resource.id} #{flag} on"
       end
     end
   else

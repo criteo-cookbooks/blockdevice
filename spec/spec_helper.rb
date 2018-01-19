@@ -7,7 +7,13 @@ def examples_data(test_name)
     [
       ::File.basename(input_file, '.in').gsub('_', ' '),
       ::File.read(input_file),
-      ::File.read(input_file.gsub(/\.in$/, '.out'))
+      ::File.read(input_file.gsub(/\.in$/, '.out')),
     ]
   end
+end
+
+def mock_shellout_command(command, **args)
+  options = { live_stream: true, run_command: true, error!: true, stdout: '' }
+  result = double("double_for_#{command}", options.merge(args))
+  allow(::Mixlib::ShellOut).to receive(:new).with(command, anything).and_return result
 end

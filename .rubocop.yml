@@ -84,7 +84,7 @@ Style/TrailingCommaInArguments:
   EnforcedStyleForMultiline: consistent_comma
 
 Metrics/BlockLength:
-  Max: 60
+  Max: 70
 
 Style/StringLiterals:
   ConsistentQuotesInMultiline: true

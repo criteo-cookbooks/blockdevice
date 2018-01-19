@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'blockdevice_volume_group' do
-  let(:guard_result) {true}
+  let(:guard_result) { true }
   before do
     stub_command("parted /dev/sda --script -- print | grep 'Partition Table: gpt'").and_return(guard_result)
   end
@@ -24,7 +24,7 @@ describe 'blockdevice_volume_group' do
     end
 
     context 'when the group does not exist' do
-      let(:guard_result) {false}
+      let(:guard_result) { false }
       it 'does execute parted' do
         expect(chef_run).to run_execute('parted /dev/sda --script -- mklabel gpt')
       end
