@@ -12,7 +12,7 @@
 
 driver:
   name: ec2
-  instance_type: t2.micro
+  instance_type: t2.medium
   associate_public_ip: true
   iam_profile_name: test-kitchen
   region: <%= ENV['AWS_REGION'] || 'us-west-2' %>
@@ -29,6 +29,11 @@ driver:
       ebs:
         volume_type: gp2
         delete_on_termination: true
+    - device_name: /dev/sdb
+      ebs:
+        volume_type: gp2
+        delete_on_termination: true
+        volume_size: 1
 
 transport:
   ssh_key: <%= ENV['HOME'] %>/.ssh/id_rsa
@@ -36,10 +41,9 @@ transport:
 platforms:
   - name: centos-7
     driver:
-      image_id: ami-d2c924b2
-  - name: windows-2012r2
-    driver:
-      image_id: ami-b871aad8
+    image_search:
+      owner-id: "847342425178"
+      name: "criteo-centos-7-ami*"
 
 suites:
 <%= require 'erubis'; Erubis::Eruby.new(File.read('.kitchen_suites.yml')).evaluate %>
