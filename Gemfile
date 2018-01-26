@@ -18,4 +18,4 @@ group :ec2 do
 end
 
 # Other gems should go after this comment
-gem 'rubocop', '=0.52.0'
+gem 'rubocop', '=0.52.1'
