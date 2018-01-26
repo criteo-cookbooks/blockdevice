@@ -85,6 +85,8 @@ Style/TrailingCommaInArguments:
 
 Metrics/BlockLength:
   Max: 70
+  Exclude:
+    - spec/**/*
 
 Style/StringLiterals:
   ConsistentQuotesInMultiline: true
@@ -112,3 +114,6 @@ Naming/FileName:
 # We don't want CRLF for ruby files, even on windows!
 Layout/EndOfLine:
   EnforcedStyle: lf
+
+Style/MixinUsage:
+  Enabled: false

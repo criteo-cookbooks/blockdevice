@@ -16,8 +16,8 @@ module BlockDevice
     def device_table(block_device)
       cmd = shell_out!("parted --script --machine #{block_device} -- unit B print free")
       cmd.stdout.split(";\n").select { |p| p =~ /^\d+:/ }
-                             .map { |line| parse_partition(line) }
-                             .sort_by { |p| p['start'] }
+         .map { |line| parse_partition(line) }
+         .sort_by { |p| p['start'] }
     end
 
     def partitions(block_device)

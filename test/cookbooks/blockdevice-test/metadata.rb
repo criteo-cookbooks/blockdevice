@@ -1,3 +1,3 @@
-name "blockdevice-test"
+name 'blockdevice-test'
 
 depends 'blockdevice'
