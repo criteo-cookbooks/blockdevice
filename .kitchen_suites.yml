@@ -1,4 +1,21 @@
 - name: default
   run_list:
-    - recipe[blockdevice::default]
+    - recipe[blockdevice-test::default]
+  verifier:
+    inspec_tests:
+      - path: test/integration/default
+    inspec:
   attributes:
+    blockdevice_test:
+      volume1:
+        blockdevice_volume_group:
+          block_device: /dev/xvdb
+          type: gpt
+        blockdevice_volume_partition:
+          block_device: /dev/xvdb
+          fs_type: xfs
+          flags:
+            - boot
+          partition_name: test1
+          offset: 20000
+          size: 102400
