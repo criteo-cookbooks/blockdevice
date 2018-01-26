@@ -5,7 +5,8 @@ describe 'blockdevice_volume_partition' do
   before do
     input_file = ::File.join(SPEC_DATA_DIR, 'parted_print')
     parted_data = ::File.read(input_file)
-    mock_shellout_command('parted --script --machine /dev/sda -- unit B print free', stdout: parted_data)
+    allow_shellout('parted --script --machine /dev/sda -- unit B print free', parted_data)
+    allow_shellout('parted --script --machine /dev/sda -- unit B print free', parted_data)
   end
   let(:chef_run) do
     ::ChefSpec::SoloRunner.new(step_into: ['blockdevice_volume_partition']) do |node|
@@ -45,13 +46,15 @@ describe 'blockdevice_volume_partition' do
     context 'when the partition does not exist' do
       let(:partition_offset) { 5_999_997_992_450 }
       let(:partition_size) { 12_345 }
-      # before do
-      #    mock_shellout_command('parted --script --machine /dev/sda -- unit B print free')
-      # end
+      before do
+      end
 
       context 'when there is enough space' do
         before do
-          mock_shellout_command(/parted.*(mkpart|-- set)/)
+          r1 = ::File.read(::File.join(SPEC_DATA_DIR, 'parted_print'))
+          r2 = ::File.read(::File.join(SPEC_DATA_DIR, 'parted_print_created'))
+          expect_shellout('parted --script --machine /dev/sda -- unit B print free', r1, r1, r2)
+          allow_shellout(/parted.*(mkpart|-- set)/, '')
         end
         it 'does not raise an exception' do
           expect { chef_run }.to_not raise_error(/Not Enough Space/)
@@ -61,7 +64,7 @@ describe 'blockdevice_volume_partition' do
           chef_run
         end
         it 'does set flags' do
-          expect(::Mixlib::ShellOut).to receive(:new).with(/parted.*-- set/, anything)
+          expect(::Mixlib::ShellOut).to receive(:new).with(/parted.*-- set 5 /, anything)
           chef_run
         end
       end
