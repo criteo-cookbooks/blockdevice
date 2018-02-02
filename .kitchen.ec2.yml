@@ -34,11 +34,6 @@ driver:
         volume_type: gp2
         delete_on_termination: true
         volume_size: 1
-    - device_name: /dev/sdc
-      ebs:
-        volume_type: gp2
-        delete_on_termination: true
-        volume_size: 1
 
 transport:
   ssh_key: <%= ENV['HOME'] %>/.ssh/id_rsa

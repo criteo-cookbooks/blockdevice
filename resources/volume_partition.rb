@@ -3,7 +3,7 @@ extend ::Chef::Mixin::ShellOut
 
 property :block_device, String, default: '/dev/sda', identity: true
 property :flags, Array, coerce: proc { |f| f.sort }
-property :fs_type, String, default: 'xfs'
+property :fs_type, [String, NilClass]
 property :id, Integer
 # Mainly for msdos disk
 property :partition_type, String, equal_to: %w[primary logical extended]
@@ -41,7 +41,6 @@ load_current_value do |desired|
     (desired.id.nil? || part['id'] == desired.id) && \
       part['start'] == desired.offset && \
       part['size'] == desired.size && \
-      part['fs_type'] == desired.fs_type && \
       part['name_or_type'] == (desired.partition_type || desired.partition_name)
   end
   current_value_does_not_exist! if partition.nil?
@@ -70,7 +69,9 @@ action :create do
       raise "[BlockDevice] Not Enough Space for #{new_resource.block_device}" if partitions.empty?
       shell_out! "parted #{new_resource.block_device} --script -- mkpart #{new_resource.partition_type} #{new_resource.partition_name} #{new_resource.fs_type} " \
                  "#{new_resource.offset}B #{new_resource.size + new_resource.offset - 1}B"
-      # reload the resource to get the partition id
+    end
+
+    converge_by 'Set flags' do
       load_current_resource
       new_resource.flags.to_a.each do |flag|
         shell_out! "parted #{new_resource.block_device} --script -- set #{current_resource.id} #{flag} on"
