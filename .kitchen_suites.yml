@@ -17,5 +17,17 @@
           flags:
             - boot
           partition_name: test1
-          offset: 20000
-          size: 102400
+          offset: 19968
+          size: 102912
+      volume2:
+        blockdevice_volume_group:
+          block_device: /dev/xvdc
+          type: msdos
+        blockdevice_volume_partition:
+          block_device: /dev/xvdc
+          fs_type: xfs
+          flags:
+            - boot
+          partition_type: primary
+          offset: 19968
+          size: 102912

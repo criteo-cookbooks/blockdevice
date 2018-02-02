@@ -68,8 +68,8 @@ action :create do
       partitions = ::BlockDevice::Parted.free_spaces(new_resource.block_device)
                                         .select { |p| new_resource.offset >= p['start'] && (new_resource.offset + new_resource.size) <= p['end'] }
       raise "[BlockDevice] Not Enough Space for #{new_resource.block_device}" if partitions.empty?
-      shell_out! "parted #{new_resource.block_device} --script -- mkpart #{new_resource.partition_type} #{new_resource.fs_type} #{new_resource.partition_name} " \
-                 "#{new_resource.offset} #{new_resource.size}"
+      shell_out! "parted #{new_resource.block_device} --script -- mkpart #{new_resource.partition_type} #{new_resource.partition_name} #{new_resource.fs_type} " \
+                 "#{new_resource.offset}B #{new_resource.size + new_resource.offset - 1}B"
       # reload the resource to get the partition id
       load_current_resource
       new_resource.flags.to_a.each do |flag|
