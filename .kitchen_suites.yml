@@ -17,5 +17,5 @@
           flags:
             - boot
           partition_name: test1
-          offset: 19968
-          size: 102912
+          offset: 1048576
+          size: 1048576

@@ -10,8 +10,10 @@ property :partition_type, String, equal_to: %w[primary logical extended]
 # For gpt disk
 property :partition_name, String
 # TODO: create a coerce
-property :offset, Integer, required: true
-property :size, Integer, required: true
+# We need a constraint that we are on a 1MiB boundary
+ALIGNMENT_CHECK = { "should be aligned on 1MiB": ->(p) { (p % 1_048_576).zero? } }.freeze
+property :offset, Integer, required: true, callbacks: ALIGNMENT_CHECK
+property :size, Integer, required: true, callbacks: ALIGNMENT_CHECK
 
 # [o.tharan@filer01-pa4 ~]$ sudo parted -m -s /dev/sda -- unit B print free
 # BYT;
@@ -58,17 +60,16 @@ load_current_value do |desired|
 end
 
 action :create do
-  package 'parted' do
-    action :nothing
-  end.run_action(:install)
+  package('parted').run_action(:install)
   if current_resource.nil?
 
+    partition_end = new_resource.size + new_resource.offset - 1
     converge_by 'Creating partition' do
       partitions = ::BlockDevice::Parted.free_spaces(new_resource.block_device)
-                                        .select { |p| new_resource.offset >= p['start'] && (new_resource.offset + new_resource.size) <= p['end'] }
+                                        .select { |p| new_resource.offset >= p['start'] && partition_end <= p['end'] }
       raise "[BlockDevice] Not Enough Space for #{new_resource.block_device}" if partitions.empty?
       shell_out! "parted #{new_resource.block_device} --script -- mkpart #{new_resource.partition_type} #{new_resource.partition_name} #{new_resource.fs_type} " \
-                 "#{new_resource.offset}B #{new_resource.size + new_resource.offset - 1}B"
+                 "#{new_resource.offset}B #{partition_end}B"
     end
 
     converge_by 'Set flags' do

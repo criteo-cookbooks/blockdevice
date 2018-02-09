@@ -31,8 +31,8 @@ describe 'blockdevice_volume_partition' do
     end
 
     context 'when the partition exists' do
-      let(:partition_offset) { 2_097_152 }
-      let(:partition_size) { 1_000_000_000 }
+      let(:partition_offset) { 1_001_390_080 }
+      let(:partition_size) { 5_978_995_032_064 }
       it 'installs the parted package' do
         expect(chef_run).to install_package('parted')
       end
@@ -44,10 +44,8 @@ describe 'blockdevice_volume_partition' do
     end
 
     context 'when the partition does not exist' do
-      let(:partition_offset) { 5_999_997_992_450 }
-      let(:partition_size) { 12_345 }
-      before do
-      end
+      let(:partition_offset) { 1_048_576 }
+      let(:partition_size) { 1_048_576 }
 
       context 'when there is enough space' do
         before do
@@ -64,13 +62,13 @@ describe 'blockdevice_volume_partition' do
           chef_run
         end
         it 'does set flags' do
-          expect(::Mixlib::ShellOut).to receive(:new).with(/parted.*-- set 5 /, anything)
+          expect(::Mixlib::ShellOut).to receive(:new).with(/parted.*-- set 4 /, anything)
           chef_run
         end
       end
 
       context 'when there is not enough space' do
-        let(:partition_size) { 100_000_000_000 }
+        let(:partition_size) { 104_857_600_000 }
         include_examples 'no disk modifications'
 
         it 'raises an exception' do
