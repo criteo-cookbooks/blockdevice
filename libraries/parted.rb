@@ -10,7 +10,7 @@ module BlockDevice
     def parse_partition(line)
       p = line.split(':')
       f = p[6].to_s.split(', ').sort
-      ::Mash.new(id: p[0].to_i, start: p[1].to_i, end: p[2].to_i, size: p[3].to_i, fs_type: p[4], name_or_type: p[5], flags: f)
+      ::Mash.new(id: p[0].to_i, start: p[1].to_i, end: p[2].to_i, size: p[3].to_i, fs_type: p[4], name: p[5], flags: f)
     end
 
     def device_table(block_device)

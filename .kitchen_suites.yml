@@ -19,3 +19,14 @@
           partition_name: test1
           offset: 1048576
           size: 1048576
+      volume2:
+        blockdevice_volume_group:
+          block_device: /dev/xvdc
+          type: msdos
+        blockdevice_volume_partition:
+          block_device: /dev/xvdc
+          flags:
+            - boot
+          partition_type: primary
+          offset: 1048576
+          size: 1048576

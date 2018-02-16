@@ -3,5 +3,5 @@ start: 47185920
 end: 8068792319
 size: 8021606400
 fs_type: ext4
-name_or_type:
+name:
 flags: []

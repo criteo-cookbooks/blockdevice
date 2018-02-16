@@ -2,6 +2,6 @@ id: 2
 start: 1002097152
 end: 5979997992447
 size: 5978995895296
-name_or_type: primary
+name: primary
 fs_type: xfs
 flags: []

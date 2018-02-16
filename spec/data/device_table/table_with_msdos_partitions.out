@@ -3,14 +3,14 @@
   end: 4194303
   size: 4162048
   fs_type: free
-  name_or_type:
+  name:
   flags: []
 - id: 1
   start: 4194304
   end: 47185919
   size: 42991616
   fs_type: fat32
-  name_or_type: ''
+  name: ''
   flags:
   - lba
 - id: 2
@@ -18,5 +18,5 @@
   end: 8068792319
   size: 8021606400
   fs_type: ext4
-  name_or_type:
+  name:
   flags: []
