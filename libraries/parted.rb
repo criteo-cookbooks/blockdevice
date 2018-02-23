@@ -7,6 +7,17 @@ module BlockDevice
 
     module_function
 
+    FS_MAP = ::Mash.new( 
+      '8300' => 'ext2',
+      '0000' => 'fat16',
+      '0000' => 'fat32',
+      '0000' => 'hfs',
+      '0700' => 'NTFS',
+      '0000' => 'reiserfs',
+      '0000' => 'ufs',
+      '0000' => 'linux-swap',
+    )
+
     def parse_partition(line)
       p = line.split(':')
       f = p[6].to_s.split(', ').sort
@@ -26,6 +37,10 @@ module BlockDevice
 
     def free_spaces(block_device)
       device_table(block_device).select { |p| p['fs_type'] == 'free' }
+    end
+
+    def map_fs_type(fs_type)
+      FS_MAP[fs_type]
     end
   end
 end

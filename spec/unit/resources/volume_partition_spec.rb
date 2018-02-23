@@ -7,6 +7,9 @@ describe 'blockdevice_volume_partition' do
     parted_data = ::File.read(input_file)
     allow_shellout('parted --script --machine /dev/sda -- unit B print free', parted_data)
     allow_shellout('parted --script --machine /dev/sda -- unit B print free', parted_data)
+
+    sgdisk_data = ::File.read(::File.join(SPEC_DATA_DIR, 'sgdisk_print'))
+    allow_shellout('sgdisk --print /dev/sda', sgdisk_data, sgdisk_data)
   end
   let(:chef_run) do
     ::ChefSpec::SoloRunner.new(step_into: ['blockdevice_volume_partition']) do |node|
@@ -34,7 +37,7 @@ describe 'blockdevice_volume_partition' do
       let(:partition_offset) { 1_001_390_080 }
       let(:partition_size) { 5_978_995_032_064 }
       it 'installs the parted package' do
-        expect(chef_run).to install_package('parted')
+        expect(chef_run).to install_package(%w[parted gdisk])
       end
       it 'logs a warning about no action' do
         expect(::Chef::Log).to receive(:warn).with(/because it already exists/)

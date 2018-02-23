@@ -3,7 +3,7 @@ extend ::Chef::Mixin::ShellOut
 
 property :block_device, String, default: '/dev/sda', identity: true
 property :flags, Array, coerce: proc { |f| f.sort }
-property :fs_type, [String, NilClass]
+property :fs_type, Integer
 property :id, Integer
 # Mainly for msdos disk
 property :partition_type, String, equal_to: %w[primary]
@@ -28,12 +28,13 @@ load_current_value do |desired|
   flags partition['flags']
   offset partition['start']
   size partition['size']
-  fs_type partition['fs_type']
   partition_name partition['name']
+
+  fs_type ::BlockDevice::Gdisk.partition_code(desired.block_device, partition['id'])
 end
 
 action :create do
-  package('parted').run_action(:install)
+  package(%w[parted gdisk]).run_action(:install)
   if current_resource.nil?
 
     partition_end = new_resource.size + new_resource.offset - 1
@@ -41,7 +42,7 @@ action :create do
       partitions = ::BlockDevice::Parted.free_spaces(new_resource.block_device)
                                         .select { |p| new_resource.offset >= p['start'] && partition_end <= p['end'] }
       raise "[BlockDevice] Not Enough Space for #{new_resource.block_device}" if partitions.empty?
-      shell_out! "parted #{new_resource.block_device} --script -- mkpart #{new_resource.partition_type} #{new_resource.partition_name} #{new_resource.fs_type} " \
+      shell_out! "parted #{new_resource.block_device} --script -- mkpart #{new_resource.partition_type} #{new_resource.partition_name} #{::BlockDevice::Parted.map_fs_type(new_resource.fs_type)} " \
                  "#{new_resource.offset}B #{partition_end}B"
     end
 
