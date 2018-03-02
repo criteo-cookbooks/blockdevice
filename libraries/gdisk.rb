@@ -10,9 +10,9 @@ module BlockDevice
     def partition_code(block_device, id)
       cmd = shell_out!("sgdisk --print #{block_device}")
       cmd.stdout.lines.reverse_each do |line|
-        fields = line.split(' ', 6)
+        fields = line.split(' ', 7)
         return nil if fields.first == 'Number'
-        return fields[4].to_i if fields.first.to_i == id
+        return fields[5] if fields.first.to_i == id
       end
     end
   end

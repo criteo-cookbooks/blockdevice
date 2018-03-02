@@ -16,3 +16,5 @@ Total free space is 2015 sectors (1007.5 KiB)
 Number  Start (sector)    End (sector)  Size       Code  Name
    1            2048            4095   1024.0 KiB  8300  Linux filesystem
    2            4097         2097151   1022.0 MiB  0700  Microsoft basic data
+   3            4097         2097151   1022.0 MiB  0700  Microsoft basic data
+   4            4097         2097151   1022.0 MiB  0700  Microsoft basic data

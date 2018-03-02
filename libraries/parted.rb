@@ -7,15 +7,11 @@ module BlockDevice
 
     module_function
 
-    FS_MAP = ::Mash.new( 
+    FS_MAP = ::Mash.new(
       '8300' => 'ext2',
-      '0000' => 'fat16',
-      '0000' => 'fat32',
-      '0000' => 'hfs',
-      '0700' => 'NTFS',
-      '0000' => 'reiserfs',
-      '0000' => 'ufs',
-      '0000' => 'linux-swap',
+      'AF00' => 'hfs',
+      '0700' => 'ntfs',
+      '8200' => 'linux-swap',
     )
 
     def parse_partition(line)
@@ -40,6 +36,8 @@ module BlockDevice
     end
 
     def map_fs_type(fs_type)
+      fs_type = fs_type.to_s.upcase
+      raise "Unknown code for '#{fs_type}'" unless FS_MAP.key? fs_type
       FS_MAP[fs_type]
     end
   end

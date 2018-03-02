@@ -3,11 +3,7 @@ extend ::Chef::Mixin::ShellOut
 
 property :block_device, String, default: '/dev/sda', identity: true
 property :flags, Array, coerce: proc { |f| f.sort }
-property :fs_type, Integer
 property :id, Integer
-# Mainly for msdos disk
-property :partition_type, String, equal_to: %w[primary]
-# For gpt disk
 property :partition_name, String
 # TODO: create a coerce
 # We need a constraint that we are on a 1MiB boundary
@@ -20,7 +16,7 @@ load_current_value do |desired|
     (desired.id.nil? || part['id'] == desired.id) && \
       part['start'] == desired.offset && \
       part['size'] == desired.size && \
-      (desired.partition_name.nil? || part['name'] == desired.partition_name)
+      part['name'] == desired.partition_name
   end
   current_value_does_not_exist! if partition.nil?
 
@@ -29,8 +25,6 @@ load_current_value do |desired|
   offset partition['start']
   size partition['size']
   partition_name partition['name']
-
-  fs_type ::BlockDevice::Gdisk.partition_code(desired.block_device, partition['id'])
 end
 
 action :create do
@@ -42,8 +36,9 @@ action :create do
       partitions = ::BlockDevice::Parted.free_spaces(new_resource.block_device)
                                         .select { |p| new_resource.offset >= p['start'] && partition_end <= p['end'] }
       raise "[BlockDevice] Not Enough Space for #{new_resource.block_device}" if partitions.empty?
-      shell_out! "parted #{new_resource.block_device} --script -- mkpart #{new_resource.partition_type} #{new_resource.partition_name} #{::BlockDevice::Parted.map_fs_type(new_resource.fs_type)} " \
-                 "#{new_resource.offset}B #{partition_end}B"
+      cmd = "parted #{new_resource.block_device} --script -- mkpart #{new_resource.partition_name} " \
+            "#{new_resource.offset}B #{partition_end}B"
+      converge_by(cmd) { shell_out! cmd }
     end
 
     converge_by 'Set flags' do
@@ -53,11 +48,11 @@ action :create do
       end
     end
   else
-		converge_if_changed(:flags) do
+    converge_if_changed(:flags) do
       new_resource.flags.to_a.each do |flag|
         shell_out! "parted #{new_resource.block_device} --script -- set #{current_resource.id} #{flag} on"
       end
-		end
+    end
     ::Chef::Log.warn "[BlockDevice] Do not create partition for '#{new_resource.name}' because it already exists"
   end
 end

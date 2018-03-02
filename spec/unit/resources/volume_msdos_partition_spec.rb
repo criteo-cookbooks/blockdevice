@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'blockdevice_volume_partition' do
+describe 'blockdevice_volume_msdos_partition' do
   let(:guard_result) { true }
   before do
     input_file = ::File.join(SPEC_DATA_DIR, 'parted_print')
@@ -12,12 +12,12 @@ describe 'blockdevice_volume_partition' do
     allow_shellout('sgdisk --print /dev/sda', sgdisk_data, sgdisk_data)
   end
   let(:chef_run) do
-    ::ChefSpec::SoloRunner.new(step_into: ['blockdevice_volume_partition']) do |node|
-      node.default['blockdevice_test']['volume1']['blockdevice_volume_partition']['block_device'] = '/dev/sda'
-      node.default['blockdevice_test']['volume1']['blockdevice_volume_partition']['partition_name'] = 'primary'
-      node.default['blockdevice_test']['volume1']['blockdevice_volume_partition']['offset'] = partition_offset
-      node.default['blockdevice_test']['volume1']['blockdevice_volume_partition']['size'] = partition_size
-      node.default['blockdevice_test']['volume1']['blockdevice_volume_partition']['flags'] = ['boot']
+    ::ChefSpec::SoloRunner.new(step_into: ['blockdevice_volume_msdos_partition']) do |node|
+      node.default['blockdevice_test']['volume1']['blockdevice_volume_msdos_partition']['block_device'] = '/dev/sda'
+      node.default['blockdevice_test']['volume1']['blockdevice_volume_msdos_partition']['partition_type'] = 'primary'
+      node.default['blockdevice_test']['volume1']['blockdevice_volume_msdos_partition']['offset'] = partition_offset
+      node.default['blockdevice_test']['volume1']['blockdevice_volume_msdos_partition']['size'] = partition_size
+      node.default['blockdevice_test']['volume1']['blockdevice_volume_msdos_partition']['flags'] = ['boot']
     end.converge('blockdevice-test')
   end
 

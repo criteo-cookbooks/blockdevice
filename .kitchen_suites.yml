@@ -2,6 +2,7 @@
   run_list:
     - recipe[blockdevice-test::default]
   verifier:
+    name: inspec
     inspec_tests:
       - path: test/integration/default
     inspec:
@@ -11,9 +12,8 @@
         blockdevice_volume_group:
           block_device: /dev/xvdb
           type: gpt
-        blockdevice_volume_partition:
+        blockdevice_volume_gpt_partition:
           block_device: /dev/xvdb
-          fs_type: 8300
           flags:
             - boot
           partition_name: test1
@@ -23,9 +23,9 @@
         blockdevice_volume_group:
           block_device: /dev/xvdc
           type: msdos
-        blockdevice_volume_partition:
+        blockdevice_volume_msdos_partition:
           block_device: /dev/xvdc
-          fs_type: 0700
+          fs_type: ntfs
           flags:
             - boot
           partition_type: primary
