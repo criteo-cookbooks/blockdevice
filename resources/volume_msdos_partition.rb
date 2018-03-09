@@ -1,7 +1,7 @@
 require 'chef/mixin/shell_out'
 extend ::Chef::Mixin::ShellOut
 
-property :block_device, String, default: '/dev/sda', identity: true
+property :block_device, String, name_property: true
 property :flags, Array, coerce: proc { |f| f.sort }
 property :fs_type, String, default: 'ntfs', equal_to: %w[ext2 hfs ntfs linux-swap]
 property :id, Integer
