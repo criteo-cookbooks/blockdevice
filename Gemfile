@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'berkshelf'
+gem 'berkshelf', '< 7.0.0'
 gem 'kitchen-vagrant'
 gem 'chefspec'
 gem 'rake'
