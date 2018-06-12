@@ -1,0 +1,8 @@
+id: 1
+start: 4194304
+end: 47185919
+size: 42991616
+fs_type: fat32
+name: ''
+flags:
+- lba

@@ -1,0 +1,14 @@
+- id: 1
+  start: 17408
+  end: 1048575
+  size: 1031168
+  fs_type: free
+  name: 
+  flags: []
+- id: 1
+  start: 5999997992448
+  end: 5999999041023
+  size: 1048576
+  name:
+  fs_type: free
+  flags: []
